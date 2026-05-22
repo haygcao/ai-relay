@@ -5,7 +5,7 @@
 
 import { NextRequest } from 'next/server';
 import { requireAdminAuth, getManagedKeys, addManagedKey, removeManagedKey, setManagedKeys } from '@/lib/admin';
-import { hashKey } from '@/lib/relay';
+import { hashKey, updateMemoryKeyPool } from '@/lib/relay';
 import { PROVIDERS } from '@/lib/providers';
 
 export const runtime = 'nodejs';
@@ -104,6 +104,7 @@ export async function POST(request: NextRequest, { params }: { params: Params })
     .filter(Boolean);
 
   const result = await addManagedKey(provider, newKey, envKeys);
+  updateMemoryKeyPool(provider, result);
 
   return Response.json({
     provider,
@@ -174,6 +175,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Params 
     }
 
     const remaining = await removeManagedKey(provider, body.key!, envKeys);
+    updateMemoryKeyPool(provider, remaining);
 
     return Response.json({
       provider,

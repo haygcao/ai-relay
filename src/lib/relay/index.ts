@@ -1,6 +1,6 @@
 export { validateAuth, getRelayApiKeys, requireAuth, generateTempKey, validateTempKey } from './auth';
 export { relayRequest } from './relay';
-export { selectKey, markCooldown, hashKey, getKeyPoolStats, initAllKeyPools } from './key-pool';
+export { selectKey, markCooldown, hashKey, getKeyPoolStats, initAllKeyPools, updateMemoryKeyPool } from './key-pool';
 export { transformToAnthropic, buildHeaders } from './transform';
 export {
   checkRateLimit,

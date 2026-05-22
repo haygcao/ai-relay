@@ -184,3 +184,25 @@ export function getKeyPoolStats(): Record<string, { total: number; available: nu
 
   return stats;
 }
+
+/**
+ * Update the memory key pool directly (called when admin modifies keys via KV).
+ */
+export function updateMemoryKeyPool(providerName: string, rawKeys: string[]): void {
+  const existing = keyPools.get(providerName);
+  const keys = rawKeys.map((key) => ({
+    key,
+    hash: hashKey(key),
+    provider: providerName,
+  }));
+  if (existing) {
+    existing.keys = keys;
+  } else {
+    keyPools.set(providerName, {
+      provider: providerName,
+      keys,
+      counter: 0,
+    });
+  }
+  lastManagedRefresh.set(providerName, Date.now());
+}

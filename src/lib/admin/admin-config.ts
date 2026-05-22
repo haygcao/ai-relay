@@ -9,23 +9,125 @@ import { withTimeout } from '@/lib/utils/timeout';
 let _kv: any = null;
 let _kvChecked = false;
 
-async function getKV() {
-  if (_kvChecked) return _kv;
-  _kvChecked = true;
-  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-    return null;
-  }
-  try {
-    const mod = await import('@vercel/kv');
-    _kv = mod.kv || mod.createClient({
-      url: process.env.KV_REST_API_URL,
-      token: process.env.KV_REST_API_TOKEN,
-    });
-    return _kv;
-  } catch {
-    return null;
-  }
+export function createMemoryMockKV() {
+  const store = new Map<string, any>();
+  return {
+    async get(key: string) {
+      return store.get(key) ?? null;
+    },
+    async set(key: string, value: any) {
+      store.set(key, value);
+      return 'OK';
+    },
+    async del(key: string) {
+      const existed = store.has(key);
+      store.delete(key);
+      return existed ? 1 : 0;
+    },
+    async hgetall(key: string) {
+      const val = store.get(key);
+      if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
+        return val;
+      }
+      return null;
+    },
+    async hset(key: string, dataOrField: any, value?: any) {
+      let current = store.get(key);
+      if (typeof current !== 'object' || current === null || Array.isArray(current)) {
+        current = {};
+        store.set(key, current);
+      }
+      if (typeof dataOrField === 'object' && dataOrField !== null) {
+        Object.assign(current, dataOrField);
+      } else if (typeof dataOrField === 'string') {
+        current[dataOrField] = value;
+      }
+      return 1;
+    },
+    async scan(cursor: number, options?: { match?: string; count?: number }) {
+      const keys = Array.from(store.keys());
+      const match = options?.match;
+      let matched = keys;
+      if (match) {
+        const regexStr = '^' + match.replace(/[-[\]{}()+?.,\\^$|#\s]/g, '\\$&').replace(/\\\*/g, '.*') + '$';
+        const regex = new RegExp(regexStr);
+        matched = keys.filter((k) => regex.test(k));
+      }
+      return [0, matched];
+    },
+    async hincrby(key: string, field: string, increment: number) {
+      let current = store.get(key);
+      if (typeof current !== 'object' || current === null || Array.isArray(current)) {
+        current = {};
+        store.set(key, current);
+      }
+      const prev = Number(current[field] || 0);
+      current[field] = prev + increment;
+      return current[field];
+    },
+    async expire(key: string, seconds: number) {
+      return 1;
+    },
+    async incr(key: string) {
+      const prev = Number(store.get(key) || 0);
+      const next = prev + 1;
+      store.set(key, next);
+      return next;
+    },
+    async sadd(key: string, member: string) {
+      let current = store.get(key);
+      if (!(current instanceof Set)) {
+        current = new Set();
+        store.set(key, current);
+      }
+      const existed = current.has(member);
+      current.add(member);
+      return existed ? 0 : 1;
+    },
+    async smembers(key: string) {
+      const current = store.get(key);
+      if (current instanceof Set) {
+        return Array.from(current);
+      }
+      return [];
+    }
+  };
 }
+
+async function getKV() {
+  const g = global as any;
+  console.log('[getKV DEBUG]', {
+    NODE_ENV: process.env.NODE_ENV,
+    KV_REST_API_URL: process.env.KV_REST_API_URL,
+    hasMock: !!g._mockKVInstance,
+    _kvChecked
+  });
+  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    if (_kv && !_kv._isMock) return _kv;
+    try {
+      const mod = await import('@vercel/kv');
+      _kv = mod.kv || mod.createClient({
+        url: process.env.KV_REST_API_URL,
+        token: process.env.KV_REST_API_TOKEN,
+      });
+      return _kv;
+    } catch {
+      return null;
+    }
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    if (!g._mockKVInstance) {
+      g._mockKVInstance = createMemoryMockKV();
+      g._mockKVInstance._isMock = true;
+    }
+    _kv = g._mockKVInstance;
+    return _kv;
+  }
+
+  return null;
+}
+
 
 // ── KV Key Prefixes ─────────────────────────────────────────
 const PREFIX = {
@@ -204,6 +306,12 @@ export async function setManagedKeys(
     throw new Error('KV storage not configured — cannot persist key overrides');
   }
   await kv.set(`${PREFIX.keys}${providerName}`, JSON.stringify(keys));
+  try {
+    const { updateMemoryKeyPool } = await import('../relay/key-pool');
+    updateMemoryKeyPool(providerName, keys);
+  } catch {
+    // ignore
+  }
 }
 
 /**

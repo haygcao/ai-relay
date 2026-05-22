@@ -89,21 +89,36 @@ let _kv: any = null;
 let _kvChecked = false;
 
 async function getKV() {
-  if (_kvChecked) return _kv;
-  _kvChecked = true;
-  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-    return null;
+  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    if (_kv && !_kv._isMock) return _kv;
+    try {
+      const mod = await import('@vercel/kv');
+      _kv = mod.kv || mod.createClient({
+        url: process.env.KV_REST_API_URL,
+        token: process.env.KV_REST_API_TOKEN,
+      });
+      return _kv;
+    } catch {
+      return null;
+    }
   }
-  try {
-    const mod = await import('@vercel/kv');
-    _kv = mod.kv || mod.createClient({
-      url: process.env.KV_REST_API_URL,
-      token: process.env.KV_REST_API_TOKEN,
-    });
+
+  if (process.env.NODE_ENV === 'development') {
+    const g = global as any;
+    if (!g._mockKVInstance) {
+      try {
+        const { createMemoryMockKV } = await import('@/lib/admin/admin-config');
+        g._mockKVInstance = createMemoryMockKV();
+        g._mockKVInstance._isMock = true;
+      } catch {
+        // ignore
+      }
+    }
+    _kv = g._mockKVInstance;
     return _kv;
-  } catch {
-    return null;
   }
+
+  return null;
 }
 
 /**

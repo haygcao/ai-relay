@@ -130,7 +130,17 @@ const TRANSLATIONS = {
     testResultSuccess: '✅ 测试成功！此密钥/密钥池可以正常调用该模型。',
     testResultFailed: '❌ 测试失败！',
     testResultFailedDetails: '状态码: {status}，错误信息: {error}',
-    noConfiguredModels: '当前没有已配置 API Key 的模型可供测试，请先在“密钥管理”中添加密钥。',
+    noConfiguredModels: '当前系统没有可用模型，请先确认服务商配置。',
+    testKeySelectLabel: '选择测试密钥：',
+    btnAddTestedKey: '➕ 将此 Key 添加到密钥池',
+    btnAddTestedKeyShort: '➕ 添加入库',
+    msgKeyAddedFromTest: 'API 密钥已成功添加到该服务商的密钥池',
+    testToolNoKeysWarning: '⚠️ 此服务商当前未配置任何内置密钥。请勾选“使用自定义 API Key”或去“密钥管理”添加密钥以进行测试。',
+    btnDeleteFailedKey: '🗑️ 从密钥池删除此失效密钥',
+    btnDeleteFailedKeyShort: '🗑️ 一键删除',
+    msgKeyDeletedFromTest: '失效的 API 密钥已成功从密钥池中删除',
+    alertDeleteFromTestFailed: '删除 API 密钥失败',
+    confirmDeleteFailedKey: '您确定要从密钥池中删除此测试失败的密钥吗？',
 
     // Provider Key Pools
     providerKeyPools: '🔑 服务商密钥池',
@@ -276,7 +286,17 @@ const TRANSLATIONS = {
     testResultSuccess: '✅ Test successful! The key/key pool can successfully call this model.',
     testResultFailed: '❌ Test failed!',
     testResultFailedDetails: 'Status: {status}, Error: {error}',
-    noConfiguredModels: 'No models with configured API keys available for testing. Please add keys in the "Keys" tab first.',
+    noConfiguredModels: 'No models available. Please configure providers first.',
+    testKeySelectLabel: 'Select Test Key:',
+    btnAddTestedKey: '➕ Add this Key to Pool',
+    btnAddTestedKeyShort: '➕ Add Key',
+    msgKeyAddedFromTest: 'API Key successfully added to the provider\'s pool',
+    testToolNoKeysWarning: '⚠️ This provider has no keys. Please check "Use custom API key" or add keys in "Keys" tab first.',
+    btnDeleteFailedKey: '🗑️ Remove this failed Key from Pool',
+    btnDeleteFailedKeyShort: '🗑️ Delete Key',
+    msgKeyDeletedFromTest: 'The failed API Key has been successfully removed from the pool',
+    alertDeleteFromTestFailed: 'Failed to remove API Key',
+    confirmDeleteFailedKey: 'Are you sure you want to remove this failed API Key from the pool?',
 
     // Provider Key Pools
     providerKeyPools: '🔑 Provider Key Pools',
@@ -997,6 +1017,7 @@ export default function AdminPage() {
             lang={lang}
             t={t}
             providers={data?.providers || []}
+            onRefreshData={fetchData}
           />
         )}
       </div>
