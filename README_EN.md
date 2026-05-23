@@ -266,17 +266,38 @@ Push daily usage reports and quota alerts via Webhooks.
 
 <!-- Format rules (delete after submitting):
 Format for each member:
+<img src="docs/assets/avatars/your-avatar.png" width="100" height="100" alt="Name">
+
 ### Name
 - **Role**: Your role
 - **Contribution**: Your core work (1-2 sentences)
 - **Contact**: Email
 
 Notes:
-1. Use your real name or commonly used name
-2. Use izmw.me corporate email
-3. Be specific about contributions
-4. Commit with your own git identity (name + email)
+1. Place avatar images in docs/assets/avatars/
+2. Use your real name or commonly used name
+3. Use izmw.me corporate email
+4. Be specific about contributions
+5. Commit with your own git identity (name + email)
 -->
+
+<!-- Team members start -->
+
+<img src="docs/assets/avatars/parsifal.png" width="100" height="100" alt="Parsifal">
+
+### Parsifal
+- **Role**: Founder & Project Lead
+- **Contribution**: Project initiator, responsible for overall architecture design, technology selection, and team management
+- **Contact**: zmw@izmw.me
+
+<img src="docs/assets/avatars/xiaohe.png" width="100" height="100" alt="小赫">
+
+### 小赫 (Xiaohe)
+- **Role**: Coordinator
+- **Contribution**: Team task coordination, requirements analysis, progress tracking, and quality assurance
+- **Contact**: xiaohe@izmw.me
+
+<!-- Team members end -->
 
 ## 🤝 Contributing
 

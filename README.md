@@ -266,17 +266,38 @@ Client → Edge Runtime (全球分发, <50ms 延迟)
 
 <!-- 格式规则（提交后删除此注释）：
 每位成员格式：
+<img src="docs/assets/avatars/你的头像文件.png" width="100" height="100" alt="姓名">
+
 ### 姓名
 - **角色**：你的角色
 - **贡献**：你负责的核心工作（1-2句话）
 - **联系**：邮箱
 
 注意：
-1. 使用你的真实姓名或常用名
-2. 邮箱用 izmw.me 企业邮箱
-3. 贡献内容要具体，不要泛泛而谈
-4. 提交时用你自己的 git 身份（名字+邮箱）
+1. 头像图片放在 docs/assets/avatars/ 目录下
+2. 使用你的真实姓名或常用名
+3. 邮箱用 izmw.me 企业邮箱
+4. 贡献内容要具体，不要泛泛而谈
+5. 提交时用你自己的 git 身份（名字+邮箱）
 -->
+
+<!-- 团队成员信息开始 -->
+
+<img src="docs/assets/avatars/parsifal.png" width="100" height="100" alt="Parsifal">
+
+### Parsifal
+- **角色**：创始人 & 项目负责人
+- **贡献**：项目发起人，负责整体架构设计、技术选型和团队管理
+- **联系**：zmw@izmw.me
+
+<img src="docs/assets/avatars/xiaohe.png" width="100" height="100" alt="小赫">
+
+### 小赫
+- **角色**：协调者
+- **贡献**：团队任务协调、需求分析、进度跟踪和质量把控
+- **联系**：xiaohe@izmw.me
+
+<!-- 团队成员信息结束 -->
 
 ## 🤝 贡献指南
 
