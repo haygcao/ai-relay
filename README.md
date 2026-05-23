@@ -289,7 +289,7 @@ Client → Edge Runtime (全球分发, <50ms 延迟)
 - [FastGPT](https://github.com/labring/FastGPT) — API 中转与知识库工作流整合
 - [Vercel](https://vercel.com) — Edge Runtime + KV 存储
 - [OpenAI](https://platform.openai.com) — OpenAI 兼容 API 标准
-
+- [Linux Do](https://linux.do/) — 温暖的开发者社区，AI Relay 的灵感来源
 ## 📄 许可证
 
 本项目基于 MIT 许可证 — 详见 [LICENSE](LICENSE) 文件。

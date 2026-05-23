@@ -289,7 +289,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - [FastGPT](https://github.com/labring/FastGPT) — API relay + knowledge base workflow integration
 - [Vercel](https://vercel.com) — Edge Runtime + KV storage
 - [OpenAI](https://platform.openai.com) — The OpenAI-compatible API standard
-
+- [Linux Do](https://linux.do/) — A warm developer community, the inspiration behind AI Relay
 ## 📄 License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
