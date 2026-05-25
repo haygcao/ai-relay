@@ -88,19 +88,30 @@
 
 点击 **Deploy**，等待部署完成。
 
-**第 2 步 — 验证**
+**第 2 步 — 启用 Vercel KV Storage 并关联项目**
+
+1. 打开 [Vercel Dashboard](https://vercel.com/dashboard)，进入刚部署的项目。
+2. 在左侧菜单选择 **Storage**，点击 **Create Database**。
+3. 选择 **KV**，创建数据库，并在弹出窗口中 **Connect to your project**（将 KV 绑定到当前项目）。
+4. 确认 Vercel 已为当前环境自动注入以下变量：
+   - `KV_REST_API_URL`
+   - `KV_REST_API_TOKEN`
+
+> 说明：如果使用 **Deploy with Vercel** 一键部署，通常 Vercel 会把 KV 环境变量自动注入到项目中；若你手动部署或后续新建 KV，请在 **Settings → Environment Variables** 中确认这些变量已存在。
+
+**第 3 步 — 验证**
 
 ```bash
 curl https://你的项目.vercel.app/health
 # → {"status":"ok"}
 ```
 
-**第 3 步 — 添加密钥**
+**第 4 步 — 添加密钥**
 
 1. 访问 `https://你的项目.vercel.app/admin`，用 `RELAY_ADMIN_KEY` 登录
 2. 进入 **Provider Keys**，添加你的 API Key（OpenAI、Claude 等）
 
-**第 4 步 — 开始调用**
+**第 5 步 — 开始调用**
 
 ```bash
 curl -X POST https://你的项目.vercel.app/v1/chat/completions \

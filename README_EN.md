@@ -88,19 +88,30 @@ Click the **Deploy with Vercel** button above, fill in 3 environment variables:
 
 Click **Deploy** and wait for it to finish.
 
-**Step 2 — Verify**
+**Step 2 — Enable Vercel KV Storage and Connect to Your Project**
+
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard) and open the project you just deployed.
+2. In the left sidebar, choose **Storage**, then click **Create Database**.
+3. Select **KV**, create the database, then **Connect to your project** in the popup.
+4. Verify Vercel has injected the following environment variables automatically:
+   - `KV_REST_API_URL`
+   - `KV_REST_API_TOKEN`
+
+> Note: If you used the one-click Deploy with Vercel button, Vercel usually injects KV environment variables automatically. If you deployed manually or created a new KV later, check **Settings → Environment Variables** to confirm these variables exist.
+
+**Step 3 — Verify**
 
 ```bash
 curl https://your-project.vercel.app/health
 # → {"status":"ok"}
 ```
 
-**Step 3 — Add Keys**
+**Step 4 — Add Keys**
 
 1. Visit `https://your-project.vercel.app/admin`, log in with `RELAY_ADMIN_KEY`
 2. Go to **Provider Keys**, add your API keys (OpenAI, Claude, etc.)
 
-**Step 4 — Start Making Requests**
+**Step 5 — Start Using**
 
 ```bash
 curl -X POST https://your-project.vercel.app/v1/chat/completions \
