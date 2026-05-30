@@ -1216,26 +1216,26 @@ export async function importBackupData(data: Record<string, any>): Promise<void>
 
     // Restore keys (if present)
     if ('keys' in data && data.keys && typeof data.keys === 'object') {
-      for (const name of allProviderNames) {
-        await kv.del(`${PREFIX.keys}${name}`);
-      }
+      await Promise.all(allProviderNames.map((name) => kv.del(`${PREFIX.keys}${name}`)));
+      const setPromises: Promise<void>[] = [];
       for (const [provider, keys] of Object.entries(data.keys)) {
         if (Array.isArray(keys) && keys.length > 0) {
-          await setManagedKeys(provider, keys);
+          setPromises.push(setManagedKeys(provider, keys));
         }
       }
+      await Promise.all(setPromises);
     }
 
     // Restore fallbacks (if present)
     if ('fallbacks' in data && data.fallbacks && typeof data.fallbacks === 'object') {
-      for (const name of allProviderNames) {
-        await kv.del(`${PREFIX.fallbacks}${name}`);
-      }
+      await Promise.all(allProviderNames.map((name) => kv.del(`${PREFIX.fallbacks}${name}`)));
+      const fallbackPromises: Promise<void>[] = [];
       for (const [provider, fallbacks] of Object.entries(data.fallbacks)) {
         if (Array.isArray(fallbacks) && fallbacks.length > 0) {
-          await setFallbackChain(provider, fallbacks);
+          fallbackPromises.push(setFallbackChain(provider, fallbacks));
         }
       }
+      await Promise.all(fallbackPromises);
     }
   }
 
