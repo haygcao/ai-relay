@@ -24,6 +24,27 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Provision Cloudflare resources
+        run: |
+          # Check and create D1 database if not exists
+          if ! pnpm exec wrangler d1 list | grep -q "ai-relay"; then
+            echo "Creating D1 database: ai-relay"
+            pnpm exec wrangler d1 create ai-relay
+          else
+            echo "D1 database ai-relay already exists"
+          fi
+
+          # Check and create KV namespace if not exists
+          if ! pnpm exec wrangler kv namespace list | grep -q "ai-relay"; then
+            echo "Creating KV namespace: ai-relay"
+            pnpm exec wrangler kv namespace create ai-relay
+          else
+            echo "KV namespace ai-relay already exists"
+          fi
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Build for Cloudflare Pages
         run: pnpm exec opennextjs-cloudflare
         env:
@@ -37,6 +58,32 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         run: pnpm exec wrangler pages deploy .vercel/output/static --project-name=ai-relay
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Configure environment variables
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          # Configure required environment variables
+          if [ -n "${{ secrets.RELAY_API_KEY }}" ]; then
+            echo "${{ secrets.RELAY_API_KEY }}" | pnpm exec wrangler pages secret put RELAY_API_KEY --project-name=ai-relay
+          fi
+
+          if [ -n "${{ secrets.RELAY_ADMIN_KEY }}" ]; then
+            echo "${{ secrets.RELAY_ADMIN_KEY }}" | pnpm exec wrangler pages secret put RELAY_ADMIN_KEY --project-name=ai-relay
+          fi
+
+          if [ -n "${{ secrets.RELAY_SIGNING_SECRET }}" ]; then
+            echo "${{ secrets.RELAY_SIGNING_SECRET }}" | pnpm exec wrangler pages secret put RELAY_SIGNING_SECRET --project-name=ai-relay
+          fi
+
+          if [ -n "${{ secrets.CRON_SECRET }}" ]; then
+            echo "${{ secrets.CRON_SECRET }}" | pnpm exec wrangler pages secret put CRON_SECRET --project-name=ai-relay
+          fi
+
+          # Set CF_PAGES flag
+          echo "1" | pnpm exec wrangler pages secret put CF_PAGES --project-name=ai-relay
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
