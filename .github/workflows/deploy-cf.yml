@@ -24,11 +24,30 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Debug environment variables
+      - name: Verify required secrets
         run: |
-          echo "CLOUDFLARE_API_TOKEN is set: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}"
-          echo "CLOUDFLARE_ACCOUNT_ID is set: ${{ secrets.CLOUDFLARE_ACCOUNT_ID != '' }}"
-          echo "RELAY_API_KEY is set: ${{ secrets.RELAY_API_KEY != '' }}"
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "❌ Error: CLOUDFLARE_API_TOKEN is not set"
+            echo "Please add it in Settings → Secrets and variables → Actions"
+            echo "Visit: https://github.com/${{ github.repository }}/settings/secrets/actions"
+            exit 1
+          fi
+
+          if [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            echo "❌ Error: CLOUDFLARE_ACCOUNT_ID is not set"
+            echo "Please add it in Settings → Secrets and variables → Actions"
+            echo "Visit: https://github.com/${{ github.repository }}/settings/secrets/actions"
+            exit 1
+          fi
+
+          if [ -z "${{ secrets.RELAY_API_KEY }}" ]; then
+            echo "❌ Error: RELAY_API_KEY is not set"
+            echo "Please add it in Settings → Secrets and variables → Actions"
+            echo "Visit: https://github.com/${{ github.repository }}/settings/secrets/actions"
+            exit 1
+          fi
+
+          echo "✅ All required secrets are configured"
 
       - name: Provision Cloudflare resources
         env:
