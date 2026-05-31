@@ -27,7 +27,7 @@ interface PendingEntry {
 
 export class BatchUsageRecorder {
   private pending = new Map<string, PendingEntry>();
-  private errorPending = new Map<string, { count: number; reason: string }>();
+  private errorPending = new Map<string, { count: number; reason: string; keyHash: string; provider: string; statusCode: number }>();
   private flushTimer: ReturnType<typeof setInterval> | null = null;
   private storage: UsageStorage | null = null;
   private totalPending = 0;
@@ -109,7 +109,7 @@ export class BatchUsageRecorder {
   }): void {
     if (this.destroyed) return;
 
-    const key = `error:${event.provider}:${event.statusCode}`;
+    const key = `error:${event.provider}:${event.statusCode}:${event.keyHash}`;
     const existing = this.errorPending.get(key);
     if (existing) {
       existing.count++;
@@ -118,6 +118,9 @@ export class BatchUsageRecorder {
       this.errorPending.set(key, {
         count: 1,
         reason: event.reason.slice(0, 200),
+        keyHash: event.keyHash,
+        provider: event.provider,
+        statusCode: event.statusCode,
       });
     }
   }
@@ -180,19 +183,16 @@ export class BatchUsageRecorder {
 
     // Flush error data
     const errorPromises: Promise<void>[] = [];
-    for (const [key, entry] of errorEntries) {
-      const parts = key.split(':');
-      if (parts.length >= 3) {
-        errorPromises.push(
-          this.storage.recordErrorDirect({
-            provider: parts[1],
-            keyHash: 'batch',
-            statusCode: Number(parts[2]),
-            reason: entry.reason,
-            count: entry.count,
-          })
-        );
-      }
+    for (const [, entry] of errorEntries) {
+      errorPromises.push(
+        this.storage.recordErrorDirect({
+          provider: entry.provider,
+          keyHash: entry.keyHash,
+          statusCode: entry.statusCode,
+          reason: entry.reason,
+          count: entry.count,
+        })
+      );
     }
 
       await Promise.allSettled([...usagePromises, ...errorPromises]);
