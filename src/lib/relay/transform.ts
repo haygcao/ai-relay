@@ -35,16 +35,21 @@ export function transformToAnthropic(body: ChatCompletionRequest): Record<string
 }
 
 /**
- * Default User-Agent presented to upstream when the client's own UA is
- * missing or belongs to a generic scripting library that some upstreams
- * block (e.g. `python-requests`, `curl`). Overridable via env.
+ * Neutral default User-Agents by upstream header format, used when the client
+ * UA is missing or a blocked script UA. These present as ordinary SDK clients
+ * that upstreams expect, and intentionally do NOT reveal that the request
+ * passed through a relay. Override any of them with RELAY_DEFAULT_USER_AGENT.
  */
-const DEFAULT_UPSTREAM_USER_AGENT = `ai-relay/${process.env.npm_package_version ?? '2.9.0'}`;
+const DEFAULT_USER_AGENTS: Record<'openai' | 'anthropic' | 'azure', string> = {
+  openai: 'OpenAI/Python 1.59.0',
+  azure: 'OpenAI/Python 1.59.0',
+  anthropic: 'Anthropic/Python 0.39.0',
+};
 
 /**
  * Lowercased prefixes/substrings of generic scripting-client User-Agents that
  * some upstream providers reject outright. These carry no useful identity, so
- * we replace them with the relay's own UA rather than forwarding them.
+ * we replace them with a neutral default UA rather than forwarding them.
  */
 const BLOCKED_USER_AGENT_PATTERNS = [
   'python-requests',
@@ -68,21 +73,25 @@ const BLOCKED_USER_AGENT_PATTERNS = [
  * A legitimate client UA (e.g. `claude-cli/1.2.3`) is forwarded unchanged so
  * the upstream sees the real caller. A missing UA, or one belonging to a
  * generic scripting library known to be blocked, is replaced with a neutral
- * relay UA so the request is not rejected before it reaches the model.
+ * SDK UA matching the upstream format — never anything that identifies the
+ * relay — so the request is accepted without leaking relay identity.
  */
-export function resolveUpstreamUserAgent(clientUserAgent?: string): string {
+export function resolveUpstreamUserAgent(
+  clientUserAgent: string | undefined,
+  headerFormat: 'openai' | 'anthropic' | 'azure'
+): string {
   const ua = clientUserAgent?.trim();
-  if (!ua) return relayDefaultUserAgent();
-
-  const lower = ua.toLowerCase();
-  if (BLOCKED_USER_AGENT_PATTERNS.some(p => lower.includes(p))) {
-    return relayDefaultUserAgent();
-  }
-  return ua;
+  if (ua && !isBlockedUserAgent(ua)) return ua;
+  return defaultUserAgent(headerFormat);
 }
 
-function relayDefaultUserAgent(): string {
-  return process.env.RELAY_DEFAULT_USER_AGENT?.trim() || DEFAULT_UPSTREAM_USER_AGENT;
+function isBlockedUserAgent(ua: string): boolean {
+  const lower = ua.toLowerCase();
+  return BLOCKED_USER_AGENT_PATTERNS.some(p => lower.includes(p));
+}
+
+function defaultUserAgent(headerFormat: 'openai' | 'anthropic' | 'azure'): string {
+  return process.env.RELAY_DEFAULT_USER_AGENT?.trim() || DEFAULT_USER_AGENTS[headerFormat];
 }
 
 /**
@@ -111,7 +120,7 @@ export function buildHeaders(
     headers['Accept'] = 'text/event-stream';
   }
 
-  headers['User-Agent'] = resolveUpstreamUserAgent(userAgent);
+  headers['User-Agent'] = resolveUpstreamUserAgent(userAgent, headerFormat);
 
   return headers;
 }

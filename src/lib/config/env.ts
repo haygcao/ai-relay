@@ -38,7 +38,8 @@
  * [Upstream Request] (optional)
  *   RELAY_DEFAULT_USER_AGENT — User-Agent presented to upstream when the client
  *                              UA is missing or a blocked generic script UA
- *                              (e.g. python-requests). Defaults to ai-relay/<version>.
+ *                              (e.g. python-requests). Defaults to a neutral SDK
+ *                              UA matching the upstream format; never reveals the relay.
  *
  * [Postgres] (optional — for S1+ when Drizzle is active)
  *   DATABASE_URL         — Postgres connection string (e.g. postgres://user:pass@host:5432/db)
