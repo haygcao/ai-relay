@@ -315,7 +315,7 @@ export const TRANSLATIONS = {
 
     // Additional interactive texts
     alertTestSuccess: '✅ 验证成功：API Key 有效！',
-    alertTestFailed: '❌ 验证失败：API Key 无效',
+    alertTestFailed: '❌ 验证失败',
     alertTestError: '测试失败',
     alertDeleteFailed: '删除密钥失败',
     alertAddFailed: '添加密钥失败',
@@ -637,7 +637,7 @@ export const TRANSLATIONS = {
 
     // Additional interactive texts
     alertTestSuccess: '✅ Verification success: API Key is valid!',
-    alertTestFailed: '❌ Verification failed: API Key is invalid',
+    alertTestFailed: '❌ Verification failed',
     alertTestError: 'Failed to test key',
     alertDeleteFailed: 'Failed to delete key',
     alertAddFailed: 'Failed to add key',
