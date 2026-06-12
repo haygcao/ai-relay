@@ -20,7 +20,7 @@
 
 <p><strong><a href="https://vercel.com/new/clone?repository-url=https://github.com/MoyuFamily/ai-relay&env=RELAY_API_KEY,RELAY_ADMIN_KEY,RELAY_SIGNING_SECRET&envDescription=API%20authentication%20keys%20(required%20for%20security)&envLink=https://github.com/MoyuFamily/ai-relay#environment-variables">👉 立即一键部署</a></strong> · <a href="#-一键部署2-分钟上线你的-ai-api-网关">查看部署步骤</a> · <a href="#-部署到-cloudflare-pages全自动">Cloudflare 部署指南</a></p>
 
-[![Version](https://img.shields.io/badge/Version-2.11.1-green.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-2.13.0-green.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
 [![Edge Runtime](https://img.shields.io/badge/Edge_Runtime-⚡-black?logo=vercel)](https://vercel.com/docs/functions/edge-functions)
@@ -471,6 +471,8 @@ Client → CF Pages Worker (全球分发, <50ms 延迟)
 3. 提交更改 (`git commit -m 'Add amazing feature'`)
 4. 推送到分支 (`git push origin feature/amazing-feature`)
 5. 提交 Pull Request
+
+维护者发布流程见 [Release Flow](docs/RELEASE-FLOW.md)：常规变更先合入 `pre-release`，验证后再发布到 `main`。Fork 用户仍可按默认 `main` 分支部署。
 
 ## 🙏 致谢
 
